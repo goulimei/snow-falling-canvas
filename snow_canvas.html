@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>canvas</title>
+	<meta charset="utf-8">
+</head>
+<body>
+	<h3>画布</h3>
+	<canvas id="canvas" width="800" height="800" style="border: 1px solid black">
+	</canvas>
+	<script type="text/javascript">
+		//预定义雪花个数和位置
+		snowPos = [
+		{x:20, y:4},
+		{x:100, y:4},
+		{x:320, y:4},
+		{x:500, y:4},
+		{x:720, y:4},
+		]
+
+		//创建雪花，n，几个花瓣；dx，初始x坐标；dy,初始y坐标； size, 花瓣大小；length，花瓣长短
+		function createFlower(ctx,n,dx,dy,size,length){
+			//1. 定义路径
+			ctx.beginPath();
+			//2. 到达初始点
+			ctx.moveTo(dx,dy+size);
+			var dig = 2*Math.PI /n ;
+			for (var i = 1; i < n+1 ; i++) {
+				var ctrlX = Math.sin((i-0.5) *dig) * length +dx;
+				var ctrlY = Math.cos((i-0.5) *dig) * length +dy;
+
+				var x = Math.sin(i*dig) * size +dx;
+				var y = Math.cos(i*dig) * size +dy; 
+				//3. 绘制
+				ctx.quadraticCurveTo(ctrlX,ctrlY,x,y);
+			}
+			ctx.closePath();
+		}
+
+		function fall(ctx){
+			ctx.fillStyle = "#000";
+			ctx.fillRect(0,0,800,800);
+
+			ctx.fillStyle = "#fff";
+			for (var i = 0, len = snowPos.length; i < len; i++) {
+				//保存当前绘图状态
+				ctx.save();
+
+				//雪花平移 
+				ctx.translate(snowPos[i].x + (Math.random() *20),snowPos[i].y+(Math.random() *6));
+
+				//雪花旋转
+				ctx.rotate((Math.random() *6 -3) * Math.PI/10);
+
+				//若到底，返回起始点
+				snowPos[i].y += Math.random() * 8;
+				if (snowPos[i].y > 800) {
+					snowPos[i].y = 4;
+				}
+
+				createFlower(ctx,6,0,0,5,8);
+				ctx.fill();
+				//恢复绘图状态
+				ctx.restore();
+			}
+		}
+		
+		var canvas = document.getElementById('canvas');
+		var ctx = canvas.getContext('2d');
+		
+		//用定时器不断重绘界面
+		setInterval("fall(ctx);",200);
+		
+	</script>
+</body>
+</html>
